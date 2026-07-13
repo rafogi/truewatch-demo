@@ -37,7 +37,10 @@ SERVICE_NAME = os.environ.get("OTEL_SERVICE_NAME", "todo-app")
 
 resource = Resource.create({"service.name": SERVICE_NAME})
 provider = TracerProvider(resource=resource)
-exporter = OTLPSpanExporter(endpoint=f"{OTLP_ENDPOINT}/v1/traces")
+# DataKit's OpenTelemetry input listens on /otel/v1/trace, not the
+# OTel-standard /v1/traces path -- see k8s/datakit-daemonset.yaml's
+# mounted opentelemetry.conf for the receiver config this must match.
+exporter = OTLPSpanExporter(endpoint=f"{OTLP_ENDPOINT}/otel/v1/trace")
 provider.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(provider)
 

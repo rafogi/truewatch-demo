@@ -134,15 +134,16 @@ az role assignment create \
 
 ## 8. Create the TrueWatch credentials Secret in-cluster (manual, not via CI)
 
-Get your Dataway URL + token from the TrueWatch console (Integrations →
-DataKit install), then:
+Get your Dataway URL from the TrueWatch console (Integrations → DataKit
+install) -- it comes with the token already embedded as a query param, e.g.
+`https://us1-openway.truewatch.com?token=<yourtoken>`. DataKit expects it
+this way; it is not a separate env var. Then:
 
 ```bash
 kubectl create namespace todo-demo --dry-run=client -o yaml | kubectl apply -f -
 kubectl create secret generic truewatch-credentials \
   --namespace todo-demo \
-  --from-literal=dataway-url='<YOUR_DATAWAY_URL>' \
-  --from-literal=token='<YOUR_TOKEN>' \
+  --from-literal=dataway-url='https://us1-openway.truewatch.com?token=<yourtoken>' \
   --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl apply -f k8s/datakit-daemonset.yaml

@@ -2,25 +2,34 @@
 # node gets its own instance collecting host metrics, container logs, and
 # receiving OTLP traces forwarded from app pods on that same node.
 #
-# PLACEHOLDERS TO FILL IN before this works end-to-end:
-#   - <TRUEWATCH_DATAWAY_URL>: your workspace's Dataway ingest URL, e.g.
-#     https://openway.truewatch.com. Found in TrueWatch console under
-#     "Integrations" / "DataKit install".
-#   - <TRUEWATCH_TOKEN>: your workspace token, same page. Do NOT commit the
-#     real value -- populate the Secret below via `kubectl create secret`
-#     (see RUNBOOK.md) rather than editing this file directly.
+# The truewatch-credentials Secret this DaemonSet reads from is NOT defined
+# here on purpose -- it's created directly with `kubectl create secret`
+# (see RUNBOOK.md step 8) using your real Dataway URL (with token embedded
+# as a query param, e.g. https://us1-openway.truewatch.com?token=<yourtoken>).
+# Keeping it out of this file means `kubectl apply -f` on this DaemonSet can
+# never accidentally overwrite the real secret with a placeholder.
+#
+# The OpenTelemetry receiver is NOT one of the simple inputs (cpu/mem/disk/
+# etc.) that can be turned on purely via ENV_DEFAULT_ENABLED_INPUTS -- it
+# needs an actual config file present under conf.d/opentelemetry/, so we
+# supply one via this ConfigMap and mount it into the container below.
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: truewatch-credentials
+  name: datakit-opentelemetry-conf
   namespace: todo-demo
-type: Opaque
-stringData:
-  # RUNBOOK.md shows how to overwrite these with real values without
-  # committing secrets to git (kubectl apply -f, or `kubectl create secret
-  # generic --dry-run=client -o yaml | kubectl apply -f -`).
-  dataway-url: "<TRUEWATCH_DATAWAY_URL>"
-  token: "<TRUEWATCH_TOKEN>"
+data:
+  opentelemetry.conf: |
+    [[inputs.opentelemetry]]
+      [inputs.opentelemetry.http]
+        enable = true
+        http_status_ok = 200
+        trace_api = "/otel/v1/trace"
+        metric_api = "/otel/v1/metric"
+      [inputs.opentelemetry.grpc]
+        trace_enable = false
+        metric_enable = false
+        addr = "127.0.0.1:4317"
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -55,14 +64,10 @@ spec:
             - name: ENV_GLOBAL_HOST_TAGS
               value: "host=__datakit_hostname,cluster=aks-todo-demo"
             - name: ENV_DEFAULT_ENABLED_INPUTS
-              # Enables the OTLP receiver (port 9529) plus baseline host
-              # metrics/container log collection.
-              value: "cpu,mem,disk,disk,net,hostobject,container,otel"
-            - name: ENV_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: truewatch-credentials
-                  key: token
+              # Baseline host metrics/container collection. The opentelemetry
+              # input is enabled separately by the presence of its mounted
+              # conf file below, not through this list.
+              value: "cpu,mem,disk,net,hostobject,container"
           resources:
             requests:
               cpu: 100m
@@ -81,7 +86,13 @@ spec:
               mountPath: /var/run/docker.sock
             - name: containerd-sock
               mountPath: /var/run/containerd/containerd.sock
+            - name: otel-conf
+              mountPath: /usr/local/datakit/conf.d/opentelemetry/opentelemetry.conf
+              subPath: opentelemetry.conf
       volumes:
+        - name: otel-conf
+          configMap:
+            name: datakit-opentelemetry-conf
         - name: proc
           hostPath:
             path: /proc
