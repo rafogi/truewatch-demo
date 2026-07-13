@@ -7,7 +7,7 @@ import logging
 import os
 import uuid
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 
 # --- OpenTelemetry setup -----------------------------------------------
 # We configure the SDK by hand (instead of `opentelemetry-instrument`) so the
@@ -99,11 +99,7 @@ def delete_todo(todo_id):
 
 @app.get("/")
 def index():
-    return jsonify(
-        service=SERVICE_NAME,
-        message="todo API is running",
-        endpoints=["/healthz", "/api/todos"],
-    ), 200
+    return render_template("index.html")
 
 
 if __name__ == "__main__":

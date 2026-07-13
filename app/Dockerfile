@@ -17,6 +17,7 @@ WORKDIR /app
 
 COPY --from=build /root/.local /home/appuser/.local
 COPY app.py .
+COPY templates/ templates/
 
 ENV PATH=/home/appuser/.local/bin:$PATH \
     PYTHONUNBUFFERED=1

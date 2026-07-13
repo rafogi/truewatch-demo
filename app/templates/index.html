@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>To-Do</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 3rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.5rem; }
+    form { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    input[type="text"] { flex: 1; padding: 0.5rem; font-size: 1rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+    li.done span { text-decoration: line-through; color: #999; }
+    li span { flex: 1; }
+    li button { background: none; border: none; color: #c00; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+  <h1>To-Do</h1>
+  <form id="add-form">
+    <input type="text" id="title" placeholder="What needs doing?" required />
+    <button type="submit">Add</button>
+  </form>
+  <ul id="list"></ul>
+
+  <script>
+    const list = document.getElementById("list");
+    const form = document.getElementById("add-form");
+    const titleInput = document.getElementById("title");
+
+    async function refresh() {
+      const res = await fetch("/api/todos");
+      const todos = await res.json();
+      list.innerHTML = "";
+      for (const todo of todos) {
+        const li = document.createElement("li");
+        li.className = todo.done ? "done" : "";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = todo.done;
+        checkbox.addEventListener("change", () => toggleDone(todo));
+
+        const span = document.createElement("span");
+        span.textContent = todo.title;
+
+        const del = document.createElement("button");
+        del.textContent = "×";
+        del.title = "Delete";
+        del.addEventListener("click", () => removeTodo(todo.id));
+
+        li.append(checkbox, span, del);
+        list.appendChild(li);
+      }
+    }
+
+    async function toggleDone(todo) {
+      await fetch(`/api/todos/${todo.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ done: !todo.done }),
+      });
+      refresh();
+    }
+
+    async function removeTodo(id) {
+      await fetch(`/api/todos/${id}`, { method: "DELETE" });
+      refresh();
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      if (!title) return;
+      await fetch("/api/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      titleInput.value = "";
+      refresh();
+    });
+
+    refresh();
+  </script>
+</body>
+</html>
