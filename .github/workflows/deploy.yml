@@ -9,6 +9,7 @@ on:
     paths:
       - "app/**"
       - "k8s/**"
+  workflow_dispatch: {} # allows manually re-running the build/deploy from the Actions tab
 
 permissions:
   id-token: write
