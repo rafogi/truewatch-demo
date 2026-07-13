@@ -58,21 +58,16 @@ jobs:
             --overwrite-existing
 
       - name: Apply k8s manifests
-        # Namespace/service/DaemonSet rarely change; applying them each run
-        # is idempotent and cheap. The Secret with real TrueWatch credentials
-        # is expected to already exist in-cluster (see RUNBOOK.md) -- this
-        # apply will not overwrite it since datakit-daemonset.yaml's Secret
-        # only holds placeholders and `kubectl apply` merges rather than
-        # replaces when using server-side apply semantics is avoided here on
-        # purpose. Safer: exclude the Secret from CI entirely.
+        # Namespace/Service rarely change; applying them each run is
+        # idempotent and cheap. deployment.yaml's placeholder image is
+        # substituted with the real just-pushed tag before applying, so we
+        # never briefly schedule the placeholder (which would ImagePullBackOff).
+        # The DataKit DaemonSet + Secret are deliberately NOT applied here --
+        # the Secret holds real TrueWatch credentials created manually
+        # in-cluster (see RUNBOOK.md), and CI must never overwrite it with
+        # datakit-daemonset.yaml's placeholder values.
         run: |
           kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/deployment.yaml
+          sed "s#todoapp.azurecr.io/todo-app:latest#$IMAGE_TAG#" k8s/deployment.yaml | kubectl apply -f -
           kubectl apply -f k8s/service.yaml
-
-      - name: Set new image on Deployment
-        run: |
-          kubectl set image deployment/todo-app \
-            todo-app="$IMAGE_TAG" \
-            -n todo-demo
           kubectl rollout status deployment/todo-app -n todo-demo --timeout=120s
