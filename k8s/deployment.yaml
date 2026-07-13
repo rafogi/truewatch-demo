@@ -1,0 +1,59 @@
+# Deploys the Flask to-do app. Image is a placeholder that CI (deploy.yml)
+# replaces with the real ACR login server + tag at deploy time via
+# `kubectl set image`, so this file itself is never hand-edited per release.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+  namespace: todo-demo
+  labels:
+    app: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      containers:
+        - name: todo-app
+          # REPLACE_ME: CI swaps this for <acr-login-server>/todo-app:<sha>
+          image: todoapp.azurecr.io/todo-app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            # Downward API: gives the pod its node's IP so it can reach the
+            # DataKit DaemonSet instance running on that same node, instead
+            # of guessing a service DNS name that doesn't exist for a
+            # DaemonSet exposed via hostPort/hostNetwork.
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_SERVICE_NAME
+              value: todo-app
+          resources:
+            # Deliberately small — this is a 1-node Standard_D2s_v7 (2 vCPU/
+            # 8GiB) cluster; keep headroom for the DataKit DaemonSet and
+            # system pods that also run on the same node.
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

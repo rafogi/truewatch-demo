@@ -1,0 +1,77 @@
+# Builds the app image, pushes it to ACR, then updates the AKS Deployment
+# to use the new tag. Runs after Terraform has applied (infra must exist
+# first), triggered on push to main affecting app/ or k8s/.
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "k8s/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  # Set these repo variables (Settings > Secrets and variables > Actions >
+  # Variables) once Terraform has created the ACR + AKS cluster.
+  ACR_NAME: ${{ vars.ACR_LOGIN_SERVER }} # e.g. acrtododemoxxxxxx.azurecr.io
+  AKS_RESOURCE_GROUP: ${{ vars.AKS_RESOURCE_GROUP }}
+  AKS_CLUSTER_NAME: ${{ vars.AKS_CLUSTER_NAME }}
+  IMAGE_NAME: todo-app
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to ACR
+        # Uses the OIDC-derived az session token rather than ACR admin
+        # credentials -- the GitHub Actions identity needs AcrPush role on
+        # the registry (see RUNBOOK.md for the role assignment command).
+        run: az acr login --name "${ACR_NAME%%.*}"
+
+      - name: Build and push image
+        working-directory: app
+        run: |
+          IMAGE_TAG="${ACR_NAME}/${IMAGE_NAME}:${{ github.sha }}"
+          docker build -t "$IMAGE_TAG" .
+          docker push "$IMAGE_TAG"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group "$AKS_RESOURCE_GROUP" \
+            --name "$AKS_CLUSTER_NAME" \
+            --overwrite-existing
+
+      - name: Apply k8s manifests
+        # Namespace/service/DaemonSet rarely change; applying them each run
+        # is idempotent and cheap. The Secret with real TrueWatch credentials
+        # is expected to already exist in-cluster (see RUNBOOK.md) -- this
+        # apply will not overwrite it since datakit-daemonset.yaml's Secret
+        # only holds placeholders and `kubectl apply` merges rather than
+        # replaces when using server-side apply semantics is avoided here on
+        # purpose. Safer: exclude the Secret from CI entirely.
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Set new image on Deployment
+        run: |
+          kubectl set image deployment/todo-app \
+            todo-app="$IMAGE_TAG" \
+            -n todo-demo
+          kubectl rollout status deployment/todo-app -n todo-demo --timeout=120s

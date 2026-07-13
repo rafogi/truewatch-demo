@@ -1,0 +1,16 @@
+# Exposes the app on a public IP via Azure's Load Balancer integration.
+# Simplest exposure option for a demo -- no ingress controller/TLS story
+# needed. AKS's cloud-controller-manager provisions an Azure Standard LB
+# automatically when a Service of type LoadBalancer is created.
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-app
+  namespace: todo-demo
+spec:
+  type: LoadBalancer
+  selector:
+    app: todo-app
+  ports:
+    - port: 80
+      targetPort: 8080

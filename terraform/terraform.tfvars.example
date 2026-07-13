@@ -1,0 +1,8 @@
+# Copy this file to terraform.tfvars and adjust as needed.
+# terraform.tfvars is gitignored -- values here are just sensible demo defaults,
+# nothing secret, but keeping a local copy out of git avoids drift surprises.
+
+location       = "eastus"
+environment    = "demo"
+aks_node_count = 1
+aks_vm_size    = "Standard_D2s_v7"

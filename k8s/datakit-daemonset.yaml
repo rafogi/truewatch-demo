@@ -1,0 +1,100 @@
+# TrueWatch's collector agent ("DataKit") runs as a DaemonSet so every AKS
+# node gets its own instance collecting host metrics, container logs, and
+# receiving OTLP traces forwarded from app pods on that same node.
+#
+# PLACEHOLDERS TO FILL IN before this works end-to-end:
+#   - <TRUEWATCH_DATAWAY_URL>: your workspace's Dataway ingest URL, e.g.
+#     https://openway.truewatch.com. Found in TrueWatch console under
+#     "Integrations" / "DataKit install".
+#   - <TRUEWATCH_TOKEN>: your workspace token, same page. Do NOT commit the
+#     real value -- populate the Secret below via `kubectl create secret`
+#     (see RUNBOOK.md) rather than editing this file directly.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: truewatch-credentials
+  namespace: todo-demo
+type: Opaque
+stringData:
+  # RUNBOOK.md shows how to overwrite these with real values without
+  # committing secrets to git (kubectl apply -f, or `kubectl create secret
+  # generic --dry-run=client -o yaml | kubectl apply -f -`).
+  dataway-url: "<TRUEWATCH_DATAWAY_URL>"
+  token: "<TRUEWATCH_TOKEN>"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: datakit
+  namespace: todo-demo
+  labels:
+    app: datakit
+spec:
+  selector:
+    matchLabels:
+      app: datakit
+  template:
+    metadata:
+      labels:
+        app: datakit
+    spec:
+      # hostNetwork lets DataKit bind directly to the node's network
+      # namespace, which is how app pods reach it via HOST_IP:9529 (see
+      # k8s/deployment.yaml) without an extra Service/ClusterIP hop.
+      hostNetwork: true
+      hostPID: true
+      containers:
+        - name: datakit
+          image: pubrepo.guance.com/datakit/datakit:1.32.0
+          env:
+            - name: ENV_DATAWAY
+              valueFrom:
+                secretKeyRef:
+                  name: truewatch-credentials
+                  key: dataway-url
+            - name: ENV_GLOBAL_HOST_TAGS
+              value: "host=__datakit_hostname,cluster=aks-todo-demo"
+            - name: ENV_DEFAULT_ENABLED_INPUTS
+              # Enables the OTLP receiver (port 9529) plus baseline host
+              # metrics/container log collection.
+              value: "cpu,mem,disk,disk,net,hostobject,container,otel"
+            - name: ENV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: truewatch-credentials
+                  key: token
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: proc
+              mountPath: /rootfs/proc
+              readOnly: true
+            - name: sys
+              mountPath: /rootfs/sys
+              readOnly: true
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+            - name: containerd-sock
+              mountPath: /var/run/containerd/containerd.sock
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: containerd-sock
+          hostPath:
+            path: /var/run/containerd/containerd.sock
+      tolerations:
+        # Ensure DataKit runs on every node regardless of taints, since it
+        # needs to observe all nodes, not just "schedulable for apps" ones.
+        - operator: Exists

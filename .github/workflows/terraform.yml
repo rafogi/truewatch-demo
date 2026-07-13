@@ -1,0 +1,80 @@
+# Runs `terraform plan` on every PR touching terraform/, and
+# `terraform apply` automatically on merge to main. Uses OIDC federated
+# login (azure/login@v2) instead of a stored client secret -- GitHub issues
+# a short-lived OIDC token that Azure AD trusts based on a federated
+# credential scoped to this repo, so there's no long-lived secret to leak.
+name: Terraform
+
+on:
+  pull_request:
+    paths:
+      - "terraform/**"
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**"
+
+permissions:
+  id-token: write # required for OIDC federated login
+  contents: read
+  pull-requests: write # to comment the plan output on the PR
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        # Terraform can read ARM_* env vars for auth automatically once
+        # azure/login has set the OIDC token up on the runner.
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+
+      - name: Comment plan on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `#### Terraform Plan\n\`\`\`\n${{ steps.plan.outputs.stdout }}\n\`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output,
+            });
+
+      - name: Fail job if plan failed
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        # Only auto-apply on main, and only after a human has reviewed the
+        # plan comment on the merged PR. The "production" environment can be
+        # configured in repo settings to require manual approval before this
+        # step runs, for an extra safety gate.
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        environment: production
+        run: terraform apply -auto-approve -input=false

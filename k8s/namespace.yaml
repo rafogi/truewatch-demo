@@ -1,0 +1,7 @@
+# Isolates the demo workload from anything else in the cluster (kube-system,
+# other demos, etc.) so `kubectl delete namespace todo-demo` fully tears down
+# the app + DataKit agent without touching the rest of the cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-demo
