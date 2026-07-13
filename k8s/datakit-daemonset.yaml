@@ -68,6 +68,13 @@ spec:
               # input is enabled separately by the presence of its mounted
               # conf file below, not through this list.
               value: "cpu,mem,disk,net,hostobject,container"
+            - name: ENV_HTTP_LISTEN
+              # DataKit's HTTP API (including the OTLP receiver) defaults to
+              # "localhost:9529", which only accepts connections from
+              # processes sharing its exact network namespace. App pods
+              # reach it via the node's real IP (see HOST_IP in
+              # k8s/deployment.yaml), so it must listen on all interfaces.
+              value: "0.0.0.0:9529"
           resources:
             requests:
               cpu: 100m
