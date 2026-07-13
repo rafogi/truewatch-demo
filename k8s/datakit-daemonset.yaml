@@ -54,7 +54,10 @@ spec:
       hostPID: true
       containers:
         - name: datakit
-          image: pubrepo.guance.com/datakit/datakit:1.32.0
+          # 1.32.0 had a nil-pointer panic in its OTLP HTTP trace handler that
+          # silently dropped every incoming trace (recovered by Gin's
+          # middleware, so the client never saw an error). 1.35.0 fixed it.
+          image: pubrepo.guance.com/datakit/datakit:1.35.0
           env:
             - name: ENV_DATAWAY
               valueFrom:

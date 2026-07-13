@@ -1,0 +1,301 @@
+{
+  "title": "todo-app Demo Dashboard",
+  "summary": "Flask to-do app on AKS -- APM + infra monitoring demo",
+  "identifier": "todo-app-demo",
+  "dashboardOwnerType": "node",
+  "dashboardType": "CUSTOM",
+  "dashboardBindSet": [],
+  "dashboardExtend": {},
+  "dashboardMapping": [],
+  "iconSet": {},
+  "main": {
+    "chartGroupPos": [
+      "chtg_todoapp_apm00000000000000000001",
+      "chtg_todoapp_infra0000000000000000001",
+      "default"
+    ],
+    "charts": [
+      {
+        "chartGroupUUID": "chtg_todoapp_apm00000000000000000001",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "HTTP requests per minute for the todo-app service",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": { "name": "APM" },
+        "name": "Request Count",
+        "pos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "prevGroupName": "APM",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "T::todo-app:(count(`trace_id`)) [::auto]"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_todoapp_reqcount00000000000001"
+      },
+      {
+        "chartGroupUUID": "chtg_todoapp_apm00000000000000000001",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Average request latency for the todo-app service",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": { "name": "APM" },
+        "name": "Average Latency",
+        "pos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "prevGroupName": "APM",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "T::todo-app:(avg(`duration`)) [::auto]"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_todoapp_latency000000000000001"
+      },
+      {
+        "chartGroupUUID": "chtg_todoapp_infra0000000000000000001",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "CPU usage on the AKS node",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": { "name": "Infrastructure" },
+        "name": "Host CPU Usage",
+        "pos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+        "prevGroupName": "Infrastructure",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::cpu:(avg(`usage_total`)) { `host` = 'aks-system-24532432-vmss000000' } BY `host`"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_todoapp_cpu0000000000000000001"
+      },
+      {
+        "chartGroupUUID": "chtg_todoapp_infra0000000000000000001",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Memory usage on the AKS node",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": { "name": "Infrastructure" },
+        "name": "Host Memory Usage",
+        "pos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+        "prevGroupName": "Infrastructure",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::mem:(avg(`used_percent`)) { `host` = 'aks-system-24532432-vmss000000' } BY `host`"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_todoapp_mem0000000000000000001"
+      },
+      {
+        "chartGroupUUID": "chtg_todoapp_infra0000000000000000001",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Network bytes received on the AKS node",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": { "name": "Infrastructure" },
+        "name": "Host Network In",
+        "pos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+        "prevGroupName": "Infrastructure",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::net:(avg(`bytes_recv`)) { `host` = 'aks-system-24532432-vmss000000' } BY `host`"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_todoapp_net0000000000000000001"
+      }
+    ],
+    "groups": [
+      { "extend": {}, "name": "APM" },
+      { "extend": {}, "name": "Infrastructure" }
+    ],
+    "type": "template",
+    "vars": []
+  },
+  "tagInfo": [
+    { "name": "todo-app" },
+    { "name": "terraform" }
+  ],
+  "thumbnail": ""
+}
