@@ -62,7 +62,7 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "T::todo-app:(count(`trace_id`)) [::auto]"
+              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app'} [::auto]"
             }
           }
         ],
@@ -116,7 +116,7 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "T::todo-app:(avg(`duration`)) [::auto]"
+              "q": "T::re(`.*`):(avg(`duration`)) {`service`='todo-app'} [::auto]"
             }
           }
         ],
