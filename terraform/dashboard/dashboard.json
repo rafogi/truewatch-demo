@@ -1,6 +1,6 @@
 {
   "title": "todo-app Demo Dashboard",
-  "summary": "Flask to-do app on AKS -- APM + infra monitoring demo",
+  "summary": "Flask to-do app on AKS -- SRE Golden Signals + saturation + infra monitoring demo",
   "identifier": "todo-app-demo",
   "dashboardOwnerType": "node",
   "dashboardType": "CUSTOM",
@@ -10,13 +10,14 @@
   "iconSet": {},
   "main": {
     "chartGroupPos": [
-      "chtg_todoapp_apm00000000000000000001",
-      "chtg_todoapp_infra0000000000000000001",
+      "chtg_e09c976605e048e8b5eb90fd65c1",
+      "chtg_b32fa1c147104bd6b38ef96dbcf8",
+      "chtg_b9147a8f116f43d9b27f08825120",
       "default"
     ],
     "charts": [
       {
-        "chartGroupUUID": "chtg_todoapp_apm00000000000000000001",
+        "chartGroupUUID": "chtg_e09c976605e048e8b5eb90fd65c1",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -45,17 +46,24 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "HTTP requests per minute for the todo-app service",
+            "titleDesc": "HTTP requests per minute for todo-app (Traffic)",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
             "yAxixOpenIncludeZero": true
           }
         },
-        "group": { "name": "APM" },
-        "name": "Request Count",
-        "pos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-        "prevGroupName": "APM",
+        "group": {
+          "name": "Golden Signals"
+        },
+        "name": "Request Rate",
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
+        "prevGroupName": "Golden Signals",
         "queries": [
           {
             "checked": true,
@@ -67,10 +75,10 @@
           }
         ],
         "type": "sequence",
-        "uuid": "chrt_todoapp_reqcount00000000000001"
+        "uuid": "chrt_001bc0153c18443a97eb87dc5a8a"
       },
       {
-        "chartGroupUUID": "chtg_todoapp_apm00000000000000000001",
+        "chartGroupUUID": "chtg_e09c976605e048e8b5eb90fd65c1",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -99,32 +107,283 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "Average request latency for the todo-app service",
+            "titleDesc": "Request latency percentiles for todo-app (Latency)",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
             "yAxixOpenIncludeZero": true
           }
         },
-        "group": { "name": "APM" },
-        "name": "Average Latency",
-        "pos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-        "prevGroupName": "APM",
+        "group": {
+          "name": "Golden Signals"
+        },
+        "name": "Latency (P50 / P95 / P99)",
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 0
+        },
+        "prevGroupName": "Golden Signals",
         "queries": [
           {
             "checked": true,
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "T::re(`.*`):(avg(`duration`)) {`service`='todo-app'} [::auto]"
+              "q": "T::re(`.*`):(p50(`duration`), p95(`duration`), p99(`duration`)) {`service`='todo-app'} [::auto]"
             }
           }
         ],
         "type": "sequence",
-        "uuid": "chrt_todoapp_latency000000000000001"
+        "uuid": "chrt_d74704b6aaf748338d940e6ac559"
       },
       {
-        "chartGroupUUID": "chtg_todoapp_infra0000000000000000001",
+        "chartGroupUUID": "chtg_e09c976605e048e8b5eb90fd65c1",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Count of todo-app spans with status != ok (Errors)",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Golden Signals"
+        },
+        "name": "Error Count",
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 0
+        },
+        "prevGroupName": "Golden Signals",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app' AND `status`!='ok'} [::auto]"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_5d55c4f4f371409990a7e01bc1a5"
+      },
+      {
+        "chartGroupUUID": "chtg_b32fa1c147104bd6b38ef96dbcf8",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "CPU usage for the todo-app container (Saturation)",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Saturation"
+        },
+        "name": "todo-app Pod CPU Usage",
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
+        "prevGroupName": "Saturation",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::docker_containers:(avg(`cpu_usage`)) {`container_name`='todo-app'} [::auto]"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_756531b0af624803a937592076e7"
+      },
+      {
+        "chartGroupUUID": "chtg_b32fa1c147104bd6b38ef96dbcf8",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Memory usage for the todo-app container (Saturation)",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Saturation"
+        },
+        "name": "todo-app Pod Memory Usage",
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 0
+        },
+        "prevGroupName": "Saturation",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::docker_containers:(avg(`mem_usage`)) {`container_name`='todo-app'} [::auto]"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_920c609809724b78bbe7332164c8"
+      },
+      {
+        "chartGroupUUID": "chtg_b32fa1c147104bd6b38ef96dbcf8",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "sequence",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Resource footprint of the DataKit observability agent itself",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Saturation"
+        },
+        "name": "datakit Pod CPU/Mem",
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 0
+        },
+        "prevGroupName": "Saturation",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::docker_containers:(avg(`cpu_usage`)) {`container_name`='datakit'} [::auto]"
+            }
+          }
+        ],
+        "type": "sequence",
+        "uuid": "chrt_166cf66b5f654ee9a3a7d73b33ce"
+      },
+      {
+        "chartGroupUUID": "chtg_b9147a8f116f43d9b27f08825120",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -160,9 +419,16 @@
             "yAxixOpenIncludeZero": true
           }
         },
-        "group": { "name": "Infrastructure" },
+        "group": {
+          "name": "Infrastructure"
+        },
         "name": "Host CPU Usage",
-        "pos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 0
+        },
         "prevGroupName": "Infrastructure",
         "queries": [
           {
@@ -170,15 +436,15 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "M::cpu:(avg(`usage_total`)) { `host` = 'aks-system-24532432-vmss000000' } BY `host`"
+              "q": "M::cpu:(avg(`usage_total`)) {`host`='aks-system-24532432-vmss000000'} BY `host`"
             }
           }
         ],
         "type": "sequence",
-        "uuid": "chrt_todoapp_cpu0000000000000000001"
+        "uuid": "chrt_3ab4412a6e7548b28224c085630e"
       },
       {
-        "chartGroupUUID": "chtg_todoapp_infra0000000000000000001",
+        "chartGroupUUID": "chtg_b9147a8f116f43d9b27f08825120",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -214,9 +480,16 @@
             "yAxixOpenIncludeZero": true
           }
         },
-        "group": { "name": "Infrastructure" },
+        "group": {
+          "name": "Infrastructure"
+        },
         "name": "Host Memory Usage",
-        "pos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 0
+        },
         "prevGroupName": "Infrastructure",
         "queries": [
           {
@@ -224,15 +497,15 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "M::mem:(avg(`used_percent`)) { `host` = 'aks-system-24532432-vmss000000' } BY `host`"
+              "q": "M::mem:(avg(`used_percent`)) {`host`='aks-system-24532432-vmss000000'} BY `host`"
             }
           }
         ],
         "type": "sequence",
-        "uuid": "chrt_todoapp_mem0000000000000000001"
+        "uuid": "chrt_be52e040efc64fd6922c3e0d8fa3"
       },
       {
-        "chartGroupUUID": "chtg_todoapp_infra0000000000000000001",
+        "chartGroupUUID": "chtg_b9147a8f116f43d9b27f08825120",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -268,9 +541,16 @@
             "yAxixOpenIncludeZero": true
           }
         },
-        "group": { "name": "Infrastructure" },
+        "group": {
+          "name": "Infrastructure"
+        },
         "name": "Host Network In",
-        "pos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+        "pos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 0
+        },
         "prevGroupName": "Infrastructure",
         "queries": [
           {
@@ -278,24 +558,41 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "M::net:(avg(`bytes_recv`)) { `host` = 'aks-system-24532432-vmss000000' } BY `host`"
+              "q": "M::net:(avg(`bytes_recv`)) {`host`='aks-system-24532432-vmss000000'} BY `host`"
             }
           }
         ],
         "type": "sequence",
-        "uuid": "chrt_todoapp_net0000000000000000001"
+        "uuid": "chrt_1dea6038c9c44e57bc46345239b6"
       }
     ],
     "groups": [
-      { "extend": {}, "name": "APM" },
-      { "extend": {}, "name": "Infrastructure" }
+      {
+        "extend": {},
+        "name": "Golden Signals"
+      },
+      {
+        "extend": {},
+        "name": "Saturation"
+      },
+      {
+        "extend": {},
+        "name": "Infrastructure"
+      }
     ],
     "type": "template",
     "vars": []
   },
   "tagInfo": [
-    { "name": "todo-app" },
-    { "name": "terraform" }
+    {
+      "name": "todo-app"
+    },
+    {
+      "name": "terraform"
+    },
+    {
+      "name": "sre"
+    }
   ],
   "thumbnail": ""
 }
