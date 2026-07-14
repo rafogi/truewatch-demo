@@ -1,8 +1,11 @@
 resource "truewatch_dashboard" "todo_app_demo" {
   name        = "todo-app Demo Dashboard"
   desc        = "Flask to-do app on AKS -- APM + infra monitoring demo"
-  is_public   = 0
+  is_public   = 1
   identifier  = "todo-app-demo"
+  # This dashboard is created via the API key's identity, not your logged-in
+  # console user, so without this it's only visible to that API identity.
+  read_permission_set = ["*"]
   tag_names = [
     "todo-app",
     "terraform",
