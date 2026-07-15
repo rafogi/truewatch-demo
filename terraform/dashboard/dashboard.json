@@ -10,21 +10,21 @@
   "iconSet": {},
   "main": {
     "chartGroupPos": [
-      "chtg_7dc67bdb90104b61888946d4f00a",
-      "chtg_63fcbade7413485aa3b63b55e9c8",
-      "chtg_fccd1a08cc844293b71bed39f411",
-      "chtg_3baec460099749ca9d7be22c4ae4",
+      "chtg_7510a122d737456f99e9efc60849",
+      "chtg_4eefe5faa6054ecf8a7229c103c6",
+      "chtg_414c604c96a6479a988729be006f",
+      "chtg_203b74110c5043c8b13f6f684863",
       "default"
     ],
     "charts": [
       {
-        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "chartGroupUUID": "chtg_7510a122d737456f99e9efc60849",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
           "settings": {
             "alias": [],
-            "chartType": "line",
+            "chartType": "singlestat",
             "colors": [],
             "compareType": [],
             "connectNulls": true,
@@ -76,16 +76,16 @@
           }
         ],
         "type": "singlestat",
-        "uuid": "chrt_f30d1398971746ac9c252d141a36"
+        "uuid": "chrt_05287148dc9944a09c2997dec574"
       },
       {
-        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "chartGroupUUID": "chtg_7510a122d737456f99e9efc60849",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
           "settings": {
             "alias": [],
-            "chartType": "line",
+            "chartType": "singlestat",
             "colors": [],
             "compareType": [],
             "connectNulls": true,
@@ -108,7 +108,7 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "Error span count in the last 5 minutes -- glance indicator",
+            "titleDesc": "Error span count -- glance indicator",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
@@ -118,7 +118,7 @@
         "group": {
           "name": "Status At a Glance"
         },
-        "name": "Errors (last 5m)",
+        "name": "Errors (recent)",
         "pos": {
           "h": 6,
           "w": 6,
@@ -132,21 +132,21 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app' AND `status`!='ok'} [::5m]"
+              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app' AND `status`!='ok'} [::auto]"
             }
           }
         ],
         "type": "singlestat",
-        "uuid": "chrt_8b8f9f11d7a0444d999f51302408"
+        "uuid": "chrt_739d053efe2e4a318faf7f1181b3"
       },
       {
-        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "chartGroupUUID": "chtg_7510a122d737456f99e9efc60849",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
           "settings": {
             "alias": [],
-            "chartType": "line",
+            "chartType": "gauge",
             "colors": [],
             "compareType": [],
             "connectNulls": true,
@@ -198,16 +198,16 @@
           }
         ],
         "type": "gauge",
-        "uuid": "chrt_5ed09d4ed90b47eaaeb1c713554f"
+        "uuid": "chrt_5bc5b45e133e40b3b211f1119d0f"
       },
       {
-        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "chartGroupUUID": "chtg_7510a122d737456f99e9efc60849",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
           "settings": {
             "alias": [],
-            "chartType": "line",
+            "chartType": "singlestat",
             "colors": [],
             "compareType": [],
             "connectNulls": true,
@@ -240,7 +240,7 @@
         "group": {
           "name": "Status At a Glance"
         },
-        "name": "Request Rate (last 5m)",
+        "name": "Request Rate (recent)",
         "pos": {
           "h": 6,
           "w": 6,
@@ -254,15 +254,15 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app'} [::5m]"
+              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app'} [::auto]"
             }
           }
         ],
         "type": "singlestat",
-        "uuid": "chrt_1282af66f5a84949905b1cdeee08"
+        "uuid": "chrt_244ec743f3ab45e39f97db0a486b"
       },
       {
-        "chartGroupUUID": "chtg_63fcbade7413485aa3b63b55e9c8",
+        "chartGroupUUID": "chtg_4eefe5faa6054ecf8a7229c103c6",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -320,10 +320,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_70e4fa285cf8402281bacac21306"
+        "uuid": "chrt_10f25de05a56409c816017bd2310"
       },
       {
-        "chartGroupUUID": "chtg_63fcbade7413485aa3b63b55e9c8",
+        "chartGroupUUID": "chtg_4eefe5faa6054ecf8a7229c103c6",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -381,10 +381,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_77ebb6272fc545d1bdda8e389f2c"
+        "uuid": "chrt_cf0285456f76416c95cc8eb9990c"
       },
       {
-        "chartGroupUUID": "chtg_63fcbade7413485aa3b63b55e9c8",
+        "chartGroupUUID": "chtg_4eefe5faa6054ecf8a7229c103c6",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -442,10 +442,10 @@
           }
         ],
         "type": "bar",
-        "uuid": "chrt_b2a24b42418349d295923e876a69"
+        "uuid": "chrt_66e2551d63d644808c57fee86c1c"
       },
       {
-        "chartGroupUUID": "chtg_fccd1a08cc844293b71bed39f411",
+        "chartGroupUUID": "chtg_414c604c96a6479a988729be006f",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -503,10 +503,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_3e61160a861342f897907f1d6eb5"
+        "uuid": "chrt_4345cd00bea24932b9a09bc7f8cb"
       },
       {
-        "chartGroupUUID": "chtg_fccd1a08cc844293b71bed39f411",
+        "chartGroupUUID": "chtg_414c604c96a6479a988729be006f",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -564,10 +564,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_97c0f15f2273499e9e65f61a6709"
+        "uuid": "chrt_dd17321f6d9347168c11e56372c1"
       },
       {
-        "chartGroupUUID": "chtg_fccd1a08cc844293b71bed39f411",
+        "chartGroupUUID": "chtg_414c604c96a6479a988729be006f",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -625,10 +625,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_f3676edcc50b4b0c8d4798c8e1f3"
+        "uuid": "chrt_d1408f986bf64db9866cc4d5bfe2"
       },
       {
-        "chartGroupUUID": "chtg_3baec460099749ca9d7be22c4ae4",
+        "chartGroupUUID": "chtg_203b74110c5043c8b13f6f684863",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -686,10 +686,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_4ea6747465ef4640bafb75084172"
+        "uuid": "chrt_67b968f4ca2b447b99a9ad4f0afa"
       },
       {
-        "chartGroupUUID": "chtg_3baec460099749ca9d7be22c4ae4",
+        "chartGroupUUID": "chtg_203b74110c5043c8b13f6f684863",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -747,10 +747,10 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_b1ce03e17e51426bbbdf20eae374"
+        "uuid": "chrt_ff03cf40fc704ddc96ea851f1046"
       },
       {
-        "chartGroupUUID": "chtg_3baec460099749ca9d7be22c4ae4",
+        "chartGroupUUID": "chtg_203b74110c5043c8b13f6f684863",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -808,7 +808,7 @@
           }
         ],
         "type": "line",
-        "uuid": "chrt_be31d9090eea44fe963b6486a02b"
+        "uuid": "chrt_dae23fa071124f25ad64da6c7504"
       }
     ],
     "groups": [
