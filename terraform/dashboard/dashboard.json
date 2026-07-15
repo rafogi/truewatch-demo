@@ -10,14 +10,15 @@
   "iconSet": {},
   "main": {
     "chartGroupPos": [
-      "chtg_e09c976605e048e8b5eb90fd65c1",
-      "chtg_b32fa1c147104bd6b38ef96dbcf8",
-      "chtg_b9147a8f116f43d9b27f08825120",
+      "chtg_7dc67bdb90104b61888946d4f00a",
+      "chtg_63fcbade7413485aa3b63b55e9c8",
+      "chtg_fccd1a08cc844293b71bed39f411",
+      "chtg_3baec460099749ca9d7be22c4ae4",
       "default"
     ],
     "charts": [
       {
-        "chartGroupUUID": "chtg_e09c976605e048e8b5eb90fd65c1",
+        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -27,7 +28,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "singlestat",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -46,7 +47,251 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "HTTP requests per minute for todo-app (Traffic)",
+            "titleDesc": "Most recent P95 request latency -- glance indicator",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Status At a Glance"
+        },
+        "name": "Current P95 Latency (ms)",
+        "pos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "prevGroupName": "Status At a Glance",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "T::re(`.*`):(p95(`duration`)) {`service`='todo-app'} [::auto]"
+            }
+          }
+        ],
+        "type": "singlestat",
+        "uuid": "chrt_f30d1398971746ac9c252d141a36"
+      },
+      {
+        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "singlestat",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Error span count in the last 5 minutes -- glance indicator",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Status At a Glance"
+        },
+        "name": "Errors (last 5m)",
+        "pos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "prevGroupName": "Status At a Glance",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app' AND `status`!='ok'} [::5m]"
+            }
+          }
+        ],
+        "type": "singlestat",
+        "uuid": "chrt_8b8f9f11d7a0444d999f51302408"
+      },
+      {
+        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "gauge",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "todo-app container memory usage as % of its limit -- saturation glance",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Status At a Glance"
+        },
+        "name": "Pod Memory Usage",
+        "pos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "prevGroupName": "Status At a Glance",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "M::docker_containers:(last(`mem_used_percent`)) {`container_name`='todo-app'} [::auto]"
+            }
+          }
+        ],
+        "type": "gauge",
+        "uuid": "chrt_5ed09d4ed90b47eaaeb1c713554f"
+      },
+      {
+        "chartGroupUUID": "chtg_7dc67bdb90104b61888946d4f00a",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "singlestat",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "Requests per minute right now -- traffic glance",
+            "unitType": "global",
+            "units": [],
+            "xAxisShowType": "time",
+            "yAxixOpenIncludeZero": true
+          }
+        },
+        "group": {
+          "name": "Status At a Glance"
+        },
+        "name": "Request Rate (last 5m)",
+        "pos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "prevGroupName": "Status At a Glance",
+        "queries": [
+          {
+            "checked": true,
+            "datasource": "dataflux",
+            "qtype": "dql",
+            "query": {
+              "q": "T::re(`.*`):(count(`trace_id`)) {`service`='todo-app'} [::5m]"
+            }
+          }
+        ],
+        "type": "singlestat",
+        "uuid": "chrt_1282af66f5a84949905b1cdeee08"
+      },
+      {
+        "chartGroupUUID": "chtg_63fcbade7413485aa3b63b55e9c8",
+        "extend": {
+          "fixedTime": "",
+          "isRefresh": false,
+          "settings": {
+            "alias": [],
+            "chartType": "line",
+            "colors": [],
+            "compareType": [],
+            "connectNulls": true,
+            "currentChartType": "line",
+            "globalUnit": [],
+            "isPercent": false,
+            "isSampling": true,
+            "isTimeInterval": true,
+            "legendPostion": "bottom",
+            "legendValues": "",
+            "levels": [],
+            "lineType": "linear",
+            "mainMeasurementQueryCode": "A",
+            "precision": "2",
+            "scientificNotation": true,
+            "showLabel": false,
+            "showLine": false,
+            "showTitle": true,
+            "slimit": 20,
+            "sorderByOrder": "desc",
+            "stackType": "time",
+            "timeInterval": "auto",
+            "titleDesc": "HTTP requests per minute for todo-app over time (Traffic)",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
@@ -56,7 +301,7 @@
         "group": {
           "name": "Golden Signals"
         },
-        "name": "Request Rate",
+        "name": "Request Rate (trend)",
         "pos": {
           "h": 8,
           "w": 8,
@@ -74,11 +319,11 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_001bc0153c18443a97eb87dc5a8a"
+        "type": "line",
+        "uuid": "chrt_70e4fa285cf8402281bacac21306"
       },
       {
-        "chartGroupUUID": "chtg_e09c976605e048e8b5eb90fd65c1",
+        "chartGroupUUID": "chtg_63fcbade7413485aa3b63b55e9c8",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -88,7 +333,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -107,7 +352,7 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "Request latency percentiles for todo-app (Latency)",
+            "titleDesc": "Request latency percentiles for todo-app over time (Latency)",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
@@ -135,21 +380,21 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_d74704b6aaf748338d940e6ac559"
+        "type": "line",
+        "uuid": "chrt_77ebb6272fc545d1bdda8e389f2c"
       },
       {
-        "chartGroupUUID": "chtg_e09c976605e048e8b5eb90fd65c1",
+        "chartGroupUUID": "chtg_63fcbade7413485aa3b63b55e9c8",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
           "settings": {
             "alias": [],
-            "chartType": "line",
+            "chartType": "bar",
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "bar",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -168,7 +413,7 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "Count of todo-app spans with status != ok (Errors)",
+            "titleDesc": "Count of todo-app spans with status != ok over time (Errors) -- bar highlights spikes better than a flat line at zero",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
@@ -178,7 +423,7 @@
         "group": {
           "name": "Golden Signals"
         },
-        "name": "Error Count",
+        "name": "Error Count (trend)",
         "pos": {
           "h": 8,
           "w": 8,
@@ -196,11 +441,11 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_5d55c4f4f371409990a7e01bc1a5"
+        "type": "bar",
+        "uuid": "chrt_b2a24b42418349d295923e876a69"
       },
       {
-        "chartGroupUUID": "chtg_b32fa1c147104bd6b38ef96dbcf8",
+        "chartGroupUUID": "chtg_fccd1a08cc844293b71bed39f411",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -210,7 +455,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -229,7 +474,7 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "CPU usage for the todo-app container (Saturation)",
+            "titleDesc": "CPU usage (cores) for the todo-app container over time (Saturation)",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
@@ -257,11 +502,11 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_756531b0af624803a937592076e7"
+        "type": "line",
+        "uuid": "chrt_3e61160a861342f897907f1d6eb5"
       },
       {
-        "chartGroupUUID": "chtg_b32fa1c147104bd6b38ef96dbcf8",
+        "chartGroupUUID": "chtg_fccd1a08cc844293b71bed39f411",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -271,7 +516,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -290,7 +535,7 @@
             "sorderByOrder": "desc",
             "stackType": "time",
             "timeInterval": "auto",
-            "titleDesc": "Memory usage for the todo-app container (Saturation)",
+            "titleDesc": "Memory usage as % of limit for the todo-app container over time (Saturation)",
             "unitType": "global",
             "units": [],
             "xAxisShowType": "time",
@@ -300,7 +545,7 @@
         "group": {
           "name": "Saturation"
         },
-        "name": "todo-app Pod Memory Usage",
+        "name": "todo-app Pod Memory %",
         "pos": {
           "h": 8,
           "w": 8,
@@ -314,15 +559,15 @@
             "datasource": "dataflux",
             "qtype": "dql",
             "query": {
-              "q": "M::docker_containers:(avg(`mem_usage`)) {`container_name`='todo-app'} [::auto]"
+              "q": "M::docker_containers:(avg(`mem_used_percent`)) {`container_name`='todo-app'} [::auto]"
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_920c609809724b78bbe7332164c8"
+        "type": "line",
+        "uuid": "chrt_97c0f15f2273499e9e65f61a6709"
       },
       {
-        "chartGroupUUID": "chtg_b32fa1c147104bd6b38ef96dbcf8",
+        "chartGroupUUID": "chtg_fccd1a08cc844293b71bed39f411",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -332,7 +577,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -361,7 +606,7 @@
         "group": {
           "name": "Saturation"
         },
-        "name": "datakit Pod CPU/Mem",
+        "name": "datakit Agent CPU Usage",
         "pos": {
           "h": 8,
           "w": 8,
@@ -379,11 +624,11 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_166cf66b5f654ee9a3a7d73b33ce"
+        "type": "line",
+        "uuid": "chrt_f3676edcc50b4b0c8d4798c8e1f3"
       },
       {
-        "chartGroupUUID": "chtg_b9147a8f116f43d9b27f08825120",
+        "chartGroupUUID": "chtg_3baec460099749ca9d7be22c4ae4",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -393,7 +638,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -440,11 +685,11 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_3ab4412a6e7548b28224c085630e"
+        "type": "line",
+        "uuid": "chrt_4ea6747465ef4640bafb75084172"
       },
       {
-        "chartGroupUUID": "chtg_b9147a8f116f43d9b27f08825120",
+        "chartGroupUUID": "chtg_3baec460099749ca9d7be22c4ae4",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -454,7 +699,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -501,11 +746,11 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_be52e040efc64fd6922c3e0d8fa3"
+        "type": "line",
+        "uuid": "chrt_b1ce03e17e51426bbbdf20eae374"
       },
       {
-        "chartGroupUUID": "chtg_b9147a8f116f43d9b27f08825120",
+        "chartGroupUUID": "chtg_3baec460099749ca9d7be22c4ae4",
         "extend": {
           "fixedTime": "",
           "isRefresh": false,
@@ -515,7 +760,7 @@
             "colors": [],
             "compareType": [],
             "connectNulls": true,
-            "currentChartType": "sequence",
+            "currentChartType": "line",
             "globalUnit": [],
             "isPercent": false,
             "isSampling": true,
@@ -562,11 +807,15 @@
             }
           }
         ],
-        "type": "sequence",
-        "uuid": "chrt_1dea6038c9c44e57bc46345239b6"
+        "type": "line",
+        "uuid": "chrt_be31d9090eea44fe963b6486a02b"
       }
     ],
     "groups": [
+      {
+        "extend": {},
+        "name": "Status At a Glance"
+      },
       {
         "extend": {},
         "name": "Golden Signals"
